@@ -20,19 +20,22 @@ import (
 //
 func (a *App) CreateDefaultChannels(teamID string) ([]*model.Channel, *model.AppError) {
 	displayNames := map[string]string{
-		"town-square": utils.T("api.channel.create_default_channels.town_square"),
-		"off-topic":   utils.T("api.channel.create_default_channels.off_topic"),
-		"announcements":  "Announcements",
-		"discussion": "Discussion",
-		"exams": "Exams",
+		"town-square":     "Assignments",
+		"off-topic":       utils.T("api.channel.create_default_channels.off_topic"),
+		"announcements":   "Announcements",
+		"discussion":      "Discussion",
+		"exams":           "Exams",
 		"conference-hall": "Conference Hall",
-		"assignments": "Assignments",
 	}
 	channels := []*model.Channel{}
 	defaultChannelNames := a.DefaultChannelNames()
 	for _, name := range defaultChannelNames {
 		displayName := utils.TDefault(displayNames[name], name)
-		channel := &model.Channel{DisplayName: displayName, Name: name, Type: model.CHANNEL_OPEN, TeamId: teamID}
+		channelType := model.CHANNEL_OPEN
+		if name == "town-square" {
+			channelType = model.CHANNEL_OPEN
+		}
+		channel := &model.Channel{DisplayName: displayName, Name: name, Type: channelType, TeamId: teamID}
 		if _, err := a.CreateChannel(channel, false); err != nil {
 			return nil, err
 		}
@@ -50,17 +53,20 @@ func (a *App) CreateDefaultChannels(teamID string) ([]*model.Channel, *model.App
 //	['town-square', 'game-of-thrones', 'wow']
 //
 func (a *App) DefaultChannelNames() []string {
-	names := []string{"town-square"}
+	names := []string{
+		"town-square",
+		"announcements",
+		"discussion",
+		"exams",
+		"conference-hall",
+		"assignments",
+	}
 
-	if len(a.Config().TeamSettings.ExperimentalDefaultChannels) == 0 {
-		names = append(names, "off-topic")
-	} else {
-		seenChannels := map[string]bool{"town-square": true}
-		for _, channelName := range a.Config().TeamSettings.ExperimentalDefaultChannels {
-			if !seenChannels[channelName] {
-				names = append(names, channelName)
-				seenChannels[channelName] = true
-			}
+	seenChannels := map[string]bool{"town-square": true}
+	for _, channelName := range a.Config().TeamSettings.ExperimentalDefaultChannels {
+		if !seenChannels[channelName] {
+			names = append(names, channelName)
+			seenChannels[channelName] = true
 		}
 	}
 
