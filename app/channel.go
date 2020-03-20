@@ -33,7 +33,7 @@ func (a *App) CreateDefaultChannels(teamID string) ([]*model.Channel, *model.App
 		displayName := utils.TDefault(displayNames[name], name)
 		channelType := model.CHANNEL_OPEN
 		if name == "town-square" {
-			channelType = model.CHANNEL_OPEN
+			channelType = model.CHANNEL_PRIVATE
 		}
 		channel := &model.Channel{DisplayName: displayName, Name: name, Type: channelType, TeamId: teamID}
 		if _, err := a.CreateChannel(channel, false); err != nil {
