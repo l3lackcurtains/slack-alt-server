@@ -20,21 +20,18 @@ import (
 //
 func (a *App) CreateDefaultChannels(teamID string) ([]*model.Channel, *model.AppError) {
 	displayNames := map[string]string{
-		"town-square":     "Assignments",
-		"off-topic":       utils.T("api.channel.create_default_channels.off_topic"),
+		"town-square":     "General",
 		"announcements":   "Announcements",
 		"discussion":      "Discussion",
 		"exams":           "Exams",
 		"conference-hall": "Conference Hall",
+		"assignments":     "Assignments",
 	}
 	channels := []*model.Channel{}
 	defaultChannelNames := a.DefaultChannelNames()
 	for _, name := range defaultChannelNames {
 		displayName := utils.TDefault(displayNames[name], name)
 		channelType := model.CHANNEL_OPEN
-		if name == "town-square" {
-			channelType = model.CHANNEL_PRIVATE
-		}
 		channel := &model.Channel{DisplayName: displayName, Name: name, Type: channelType, TeamId: teamID}
 		if _, err := a.CreateChannel(channel, false); err != nil {
 			return nil, err
